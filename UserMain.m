@@ -13,7 +13,7 @@
 % results in Command Window, and plots key figures.
 %
 % For changing default user data, please use "UserData.xlsx". More examples
-% can be found in "Examples" folder.
+% can be found in "Examples" folder.  
 
 %% Clear matlab
 clear all;  % Clear Matlab workspace
