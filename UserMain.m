@@ -25,14 +25,14 @@ close all;  % Close all figures, etc
 % Default
 % "UserData.xlsx" defaultly contains the data of a 4-bus
 % generator-inverter-composite power system. Please feel free to change it.
-UserData = 'UserData.xlsm';
+% UserData = 'UserData.xlsm';
 
 % Other example power systems (in "Examples" folder):
 %
 % Pure ac power system examples:
 % UserData = 'SgInfiniteBus.xlsx';              % Single synchronous generator and infinite bus
 % UserData = 'GflInverterInfiniteBus.xlsx';   	% Single grid-following inverter and infinite bus
-% UserData = 'GfmInverterInfiniteBus.xlsx';   	% Single grid-forming inverter and infinite bus
+UserData = 'GfmInverterInfiniteBus.xlsx';   	% Single grid-forming inverter and infinite bus
 % UserData = 'IEEE_14Bus.xlsx';
 % UserData = 'IEEE_30Bus.xlsx';
 % UserData = 'IEEE_57Bus.xlsx';

@@ -125,6 +125,7 @@ properties(Access = protected)
     
     % Start Flag
     Start = 0;
+    test = 0;
 end
 
 properties(GetAccess = protected, Constant)
@@ -290,7 +291,8 @@ methods(Access = protected)
         obj.Timer = 0;
         
         % Initialize start flag
-        obj.Start = 0;       
+        obj.Start = 0;
+        %obj.delta_x = obj.x;
     end
     
     % Initialize / reset discrete-state properties
@@ -320,8 +322,10 @@ methods(Access = protected)
             % x[k+1]-x[k] = Ts * f(x[k],u[k])
             % y[k+1] = g(x[k],u[k]);
           	case 1
-                delta_x = obj.Ts * obj.StateSpaceEqu(obj, obj.x, u, 1);
-                obj.x = delta_x + obj.x;
+                aaa = obj.Ts * obj.StateSpaceEqu(obj, obj.x, u, 1);
+                aa = obj.StateSpaceEqu(obj, obj.x, u, 1);
+                obj.test = aa(3);
+                obj.x = aaa + obj.x;
                 
             % ### Case 2 : Hybrid Euler-Trapezoidal (Yunjie's Method)
             % s -> 2/Ts*(z-1)/(z+1)
@@ -374,8 +378,11 @@ methods(Access = protected)
                 if obj.LinearizationTimes == 2    
                     obj.SetDynamicSS(obj,obj.x,obj.u);
                 end
-                delta_x = obj.Wk * obj.StateSpaceEqu(obj,obj.x,u,1);               
-                obj.x = obj.x + delta_x;             
+                obj.SetDynamicSS(obj,obj.x,u);
+                aaa = obj.Wk * obj.StateSpaceEqu(obj,obj.x,u,1);
+                aa = obj.StateSpaceEqu(obj,obj.x,u,1);
+                obj.test = aa(3);
+                obj.x = obj.x + aaa;             
         end
         
         obj.Timer = obj.Timer + obj.Ts;
@@ -384,39 +391,43 @@ methods(Access = protected)
     % ### Calculate output y
 	function y = outputImpl(obj,u)
         
-        switch obj.DiscreMethod
+        %switch obj.DiscreMethod
             
             % ### Case 1: Forward Euler
             % Notes: Can we also seperate the virtual resistor for forward
             % Euler method?
-          	case 1
-                if obj.DirectFeedthrough
-                    y = obj.StateSpaceEqu(obj,obj.x,u,2);
-                else
-                    if obj.VirtualResistor
-                        y = obj.StateSpaceEqu(obj,obj.x,obj.uk,2) - obj.Gk*obj.uk + obj.Fk*(u-obj.uk);
-                    else
-                        y = obj.StateSpaceEqu(obj,obj.x,obj.uk,2) + obj.Fk*(u-obj.uk);
-                    end
-                end
+          	%case 1
+%                 if obj.DirectFeedthrough
+%                     y = obj.StateSpaceEqu(obj,obj.x,u,2);
+%                 else
+%                     if obj.VirtualResistor
+%                         y = obj.StateSpaceEqu(obj,obj.x,obj.uk,2) - obj.Gk*obj.uk + obj.Fk*(u-obj.uk);
+%                     else
+%                         y = obj.StateSpaceEqu(obj,obj.x,obj.uk,2) + obj.Fk*(u-obj.uk);
+%                     end
+%                 end
                 
             % ### Case 2 : Hybrid Euler-Trapezoidal (Yunjie's Method)
             % ### Case 2': General virtual dissipation (Yitong's Method)
             % case 2' turns out to be equivalent to case 2 and therefore 
             % is combined with case 2
-            case 2
-                
-                if obj.DirectFeedthrough
-                    y = obj.StateSpaceEqu(obj,obj.x,u,2) + 1/2*obj.Ck*obj.Wk*obj.StateSpaceEqu(obj,obj.x,u,1);
-                else
-                    if obj.VirtualResistor
-                        y = obj.StateSpaceEqu(obj,obj.x,obj.uk,2) + 1/2*obj.Ck*obj.Wk*obj.StateSpaceEqu(obj,obj.x,obj.uk,1) - obj.Gk*obj.uk + obj.Fk*(u-obj.uk);
-                    else
-                        y = obj.StateSpaceEqu(obj,obj.x,obj.uk,2) + 1/2*obj.Ck*obj.Wk*obj.StateSpaceEqu(obj,obj.x,obj.uk,1) + obj.Fk*(u-obj.uk);
-                    end
-                end
-        end
-        
+%             case 2
+%                 
+%                 if obj.DirectFeedthrough
+%                     y = obj.StateSpaceEqu(obj,obj.x,u,2) + 1/2*obj.Ck*obj.Wk*obj.StateSpaceEqu(obj,obj.x,u,1);
+%                 else
+%                     if obj.VirtualResistor
+%                         y = obj.StateSpaceEqu(obj,obj.x,obj.uk,2) + 1/2*obj.Ck*obj.Wk*obj.StateSpaceEqu(obj,obj.x,obj.uk,1) - obj.Gk*obj.uk + obj.Fk*(u-obj.uk);
+%                     else
+%                         y = obj.StateSpaceEqu(obj,obj.x,obj.uk,2) + 1/2*obj.Ck*obj.Wk*obj.StateSpaceEqu(obj,obj.x,obj.uk,1) + obj.Fk*(u-obj.uk);
+%                     end
+%                 end
+        %end
+        y = obj.StateSpaceEqu(obj,obj.x,obj.uk,2) + 1/2*obj.Ck*obj.Wk*obj.StateSpaceEqu(obj,obj.x,obj.uk,1) - obj.Gk*obj.uk + obj.Fk*(u-obj.uk);
+        a = obj.StateSpaceEqu(obj,obj.x,obj.uk,2);
+        b = obj.StateSpaceEqu(obj, obj.x, u, 1);
+        c = obj.Wk * obj.StateSpaceEqu(obj,obj.x,u,1);
+        y(5:8) = [obj.test; a(7) ; y(7); y(7)];
         obj.uk = u;                 % store the current u=u[k+1/2]
         obj.Start = 1;        
     end

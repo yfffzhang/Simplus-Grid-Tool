@@ -35,7 +35,7 @@ classdef GridFormingVSI < SimplusGT.Class.ModelAdvance
         function [State,Input,Output] = SignalList(obj)
          	State  = {'i_ld','i_lq','i_ld_i','i_lq_i','v_od','v_oq','v_od_i','v_oq_i','i_od','i_oq','v_d_ref','w','theta'};
             Input  = {'v_d','v_q','P0'};
-            Output = {'i_d','i_q','w','theta'};
+            Output = {'i_d','i_q','w','theta','a','b','c','d'};
         end
         
         % Calculate the equilibrium
@@ -179,15 +179,15 @@ classdef GridFormingVSI < SimplusGT.Class.ModelAdvance
             w_limit_H = W0*1.1;
             w_limit_L = W0*0.9;
             % Capacitor voltage limit
-            v_od_limit_H = 1.5;
-            v_od_limit_L = -1.5;
-            v_oq_limit_H = 1.5;
-            v_oq_limit_L = -1.5;    
+            v_od_limit_H = 2;
+            v_od_limit_L = -2;
+            v_oq_limit_H = 2;
+            v_oq_limit_L = -2;    
             % Current reference limit
-            i_ld_limit = 1.5;
-            i_lq_limit = 1.5;
+            i_ld_limit = 2;
+            i_lq_limit = 2;
             % Ac voltage limit
-            e_d_limit_H = 1.5;
+            e_d_limit_H = 1.02;
             e_d_limit_L = -1.5;
             e_q_limit_H = 1.5;
             e_q_limit_L = -1.5;
@@ -196,7 +196,7 @@ classdef GridFormingVSI < SimplusGT.Class.ModelAdvance
             % State space equations
          	% dx/dt = f(x,u)
             % y     = g(x,u)
-            if CallFlag == 1    
+           
             % ### Call state equation: dx/dt = f(x,u)
             
                 % Power measurement
@@ -326,7 +326,7 @@ classdef GridFormingVSI < SimplusGT.Class.ModelAdvance
 
                 % Phase angle
                 dtheta = w;
-       
+            if CallFlag == 1    
                 % dx
                 f_xu = [di_ld; di_lq; di_ld_i; di_lq_i; dv_od; dv_oq; dv_od_i; dv_oq_i; di_od; di_oq; dv_od_r; dw; dtheta];
                 Output = f_xu;
@@ -334,7 +334,7 @@ classdef GridFormingVSI < SimplusGT.Class.ModelAdvance
             elseif CallFlag == 2     
             % ### Call output equations: y = g(x,u)
                 g_xu = [i_od; i_oq; w; theta];
-                Output = g_xu;
+                Output = [g_xu; 0 ; di_ld_i; i_ld_i ; e_d ];
             end
             
         end
