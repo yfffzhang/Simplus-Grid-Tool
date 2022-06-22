@@ -40,6 +40,9 @@ w_tau = 1e3 *2*pi;  % (rad/s)
 w_i_GFL = 1000 *2*pi;    % (rad/s)
 
 % Rated line impedance
-X_rated_GFL = 0.4;
-R_rated_GFL = X_rated_GFL/5;
+Lg = 0.4;
+Rg = 1e-6;
 
+%% voltage sag
+t0=2;
+dt=0.2;
